@@ -20,10 +20,21 @@
 #include "view.h"
 #include "controller.h"
 
+/* Ship properties */
+double shipCentX = 240;
+double shipCentY = 146;
+double shipFrontX = shipCentX;
+double shipFrontY = shipCentY - 15;
+double shipLeftX = shipCentX - 7;
+double shipLeftY = shipCentY + 10;
+double shipRightX = shipCentX +7;
+double shipRightY = shipCentY +10;
+
 /* Game state */
 float elapsed_time; 
 int   score;
 int   lives;
+int shieldState;
 struct ship player;
 
 float Dt = 0.01f;

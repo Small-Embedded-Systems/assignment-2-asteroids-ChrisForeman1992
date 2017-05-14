@@ -1,22 +1,17 @@
 /* Controller */
-
 /* C libraries */
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <math.h>
-
-
 /* hardware platform libraries */
 #include <mbed.h>
-
-/* asteroids */
+/* Main game elements */
 #include "model.h"
 #include "asteroids.h"
-#include <display.h>
+#include "objects.h"
 
-/* Joystick 5-way switch
-*/
+/* Joystick 5-way switch */
 typedef enum {JLT = 0, JRT, JUP, JDN, JCR} btnId_t;
 static DigitalIn jsBtns[] = {P5_0, P5_4, P5_2, P5_1, P5_3}; // LFT, RGHT, UP, DWN, CTR
 bool jsPrsdAndRlsd(btnId_t b);
@@ -25,42 +20,39 @@ bool joystickRight;
 bool joystickUp;
 bool joystickDown;
 bool joystickCenter;
-Display *graphics = Display::theDisplay();
 
-
-void controls(void){
-	
+/* User controls including game start, ship movement and rocket firing */
+void controls(void){	
 	if (jsPrsdAndRlsd(JLT)) {
 		joystickRight = false; 
 		joystickLeft = true; 
-		graphics->setCursor(150,150);
-		graphics->printf("LEFT PRESSED");
-	}
+	} 	
 	if (jsPrsdAndRlsd(JRT)) {
 		joystickLeft = false; 
 		joystickRight = true; 
-		graphics->setCursor(150,170);
-		graphics->printf("RIGHT PRESSED");
-	}	
+	} 	
 	if (jsPrsdAndRlsd(JUP)) {
+	  joystickUp = true; 
 		joystickDown = false; 
-		joystickUp = true; 
-		graphics->setCursor(150,190);
-		graphics->printf("UP PRESSED");
-	}	
+		joystickLeft = false; 
+		joystickRight = false;
+	} 	
  	if (jsPrsdAndRlsd(JDN)) {
 		joystickUp = false; 
 		joystickDown = true; 
-		graphics->setCursor(150,210);
-		graphics->printf("DOWN PRESSED");		
-	}
-	if (jsPrsdAndRlsd(JCR)) {
-		joystickCenter = true; 
-		graphics->setCursor(150,230);
-		graphics->printf("CENTER PRESSED");		
+		}	
+	if (jsPrsdAndRlsd(JCR)) {		
+		newMissile(missiles);
 	}	
 }
 
+/* Causes the game to restart on user pressing center button when lives are equal to 0*/
+	bool (restartGame(void)) {
+		if (lives ==0 && jsPrsdAndRlsd(JCR)) {
+			return true;
+	}
+			return false;
+}		
 
 bool jsPrsdAndRlsd(btnId_t b) {
 bool result = false;

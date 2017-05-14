@@ -1,4 +1,5 @@
 void controls(void);
+extern bool restartGame(void);
 
 extern bool joystickUp; 
 extern bool joystickDown; 

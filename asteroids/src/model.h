@@ -11,15 +11,22 @@ struct ship {
     vector_t     v;
 };
 
-/* initial struts for building linked lists */
-struct rock {
-    coordinate_t p;
-    struct rock *next;
-};
+typedef struct asteroid_t {
+		coordinate_t p;
+		vector_t v;
+    struct asteroid_t* next;
+} asteroid_t;
 
-struct missile {
+typedef struct missile_t {
     coordinate_t p;
-    struct missile *next;
-};
+		vector_t v;
+		int age;
+    struct missile_t* next;
+} missile_t;
+
+
+
+void newMissile(missile_t *head);
+void newRock(asteroid_t *head);
 
 void physics(void);

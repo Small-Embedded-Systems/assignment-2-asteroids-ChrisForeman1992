@@ -1,81 +1,77 @@
-/* Asteroids
-    Sample solution for assignment
-    Semester 2 -- Small Embedded Systems
-    Dr Alun Moon
-*/
-
-/* C libraries */
+/* Asteroids	
+	 Semester 2 -- Small Embedded Systems	
+	 Christopher Foreman */
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <math.h>
 #include <string.h>
-
 /* hardware platform libraries */
 #include <display.h>
 #include <mbed.h>
-
 /* Main game elements */
 #include "model.h"
 #include "view.h"
 #include "controller.h"
+#include "utils.h"
+
+/* Game state variables*/
+float elapsed_time; 
+int score =0;
+int lives =3;
+int shield =2;
+struct ship player;
+int frames;
+int asteroidCount;
+int missileCount;
+asteroid_t * asteroids;
+missile_t * missiles;
 
 /* Ship properties */
-double shipCentX = 240;
-double shipCentY = 146;
+double shipCentX = 200;
+double shipCentY = 100;
 double shipFrontX = shipCentX;
-double shipFrontY = shipCentY - 15;
-double shipLeftX = shipCentX - 7;
-double shipLeftY = shipCentY + 10;
-double shipRightX = shipCentX +7;
-double shipRightY = shipCentY +10;
+double shipFrontY = shipCentY - 6;
+double shipLeftX = shipCentX - 4;
+double shipLeftY = shipCentY + 4;
+double shipRightX = shipCentX + 4;
+double shipRightY = shipCentY + 4;
 
-/* Game state */
-float elapsed_time; 
-int   score;
-int   lives;
-int shieldState;
-struct ship player;
-
+/* Tickers */
 float Dt = 0.01f;
-
 Ticker model, view, controller;
 
-bool paused = true;
-/* The single user button needs to have the PullUp resistor enabled */
-DigitalIn userbutton(P2_10,PullUp);
-int main()
-{
-
+/* Initialises asteroid and missile linked lists*/
+void initialise() {
+		asteroids = static_cast<asteroid_t*>(malloc(sizeof(asteroid_t)));
+		asteroids->next = NULL;	
+		missiles = static_cast<missile_t*>(malloc(sizeof(missile_t)));
+		missiles->next = NULL;
+}
+/* Calls initialiser for linked list, buffer and attaches required tickers*/
+int main() {
+		initialise();
     init_DBuffer();
-    
-
-    view.attach( draw, 0.025);
-    model.attach( physics, Dt);
-    controller.attach( controls, 0.1);
-    
-    lives = 5;
-    
-    /* Pause to start */
-    while( userbutton.read() ){ /* remember 1 is not pressed */
-        paused=true;
-        wait_ms(100);
-    }
-    paused = false;
-    
-    while(true) {
-        /* do one of */
-        /* Wait until all lives have been used
-        while(lives>0){
-            // possibly do something game related here
-            wait_ms(200);
-        }
-        */
-        /* Wait until each life is lost
-        while( inPlay ){
-            // possibly do something game related here
-            wait_ms(200);
-        }
-        */
-    }
+		view.attach(draw, 0.05);
+    model.attach(physics, Dt);
+    controller.attach( controls, 0.1); 
+/* Causes the game to display a game over screen when lives reach 0, from this the player can choose to restart*/
+		while(true) {
+		if(lives == 0){
+			model.detach();
+			view.detach();
+			controller.detach();
+			gameOver();
+/*Resets game variables and redraws elements when game is restarted from the game over screen */			
+			if(restartGame()) {
+				score = 0;
+				lives = 3;
+				shield = 2;
+				view.attach(draw, 0.05);
+				model.attach(physics, Dt);
+				controller.attach(controls, 0.1);		
+				draw();
+			}
+		}
+	}    
 }
